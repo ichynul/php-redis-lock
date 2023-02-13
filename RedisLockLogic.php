@@ -43,7 +43,6 @@ class RedisLockLogic
 
     protected $locks = [];
 
-    protected $lastKey = '';
     protected $separator = '__redis_lock__';
     protected $predis = false;
 
@@ -108,7 +107,7 @@ class RedisLockLogic
         }
 
         if (isset($this->locks[$key])) {
-            throw new \Exception('已存在key不为空,请确保每个key只加锁一次' . $key); //
+            throw new \Exception('已存在key不为空,请确保每个key只加锁一次:' . $key); //
         }
 
         if ($expire < 1) {
@@ -140,7 +139,7 @@ class RedisLockLogic
         }
 
         if (!isset($this->locks[$key])) {
-            throw new \Exception('加锁成功过才能解锁,key:' . $key . ',' . json_encode($this->locks)); //
+            throw new \Exception('加锁成功过才能解锁,key:' . $key); //
         }
 
         $this->del($key, $this->locks[$key]);
