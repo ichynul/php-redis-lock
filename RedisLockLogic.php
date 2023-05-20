@@ -9,7 +9,7 @@ namespace app\common\logic;
  * 
  * $rdLock = new RedisLockLogic;
  * $key1 = 'mykey1';
- * $key2 = 'mykey2';//同一个实例可以多个分别锁定多个key
+ * $key2 = 'mykey2';//同一个实例可以分别锁定多个key
  * 
  * if($rdLock->lock($key1) && $rdLock->lock($key2))
  * {
