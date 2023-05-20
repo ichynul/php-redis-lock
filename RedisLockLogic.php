@@ -100,7 +100,7 @@ class RedisLockLogic
      * @param int $expire 业务超时(秒)，根据业务复杂程度调节
      * @return bool 是否加锁成功
      */
-    public function lock($key, $owner = '', $expire = 3)
+    public function lock($key, $owner = '', $expire = 60)
     {
         if (!empty($this->options['prefix'])) {
             $key = $this->options['prefix'] . $key;
@@ -167,7 +167,7 @@ class RedisLockLogic
      * @param int $expire
      * @return bool
      */
-    public function checkExpire($key, $owner, $expire)
+    protected function checkExpire($key, $owner, $expire)
     {
         $isLock = false;
 
@@ -217,13 +217,9 @@ class RedisLockLogic
 
             //防止key写入成功后未正常释放，后续再未被访问，key就会一直存在。
             //让redis主动清理掉
-            $this->handler->expire($key, $expire + 60); 
+            $this->handler->expire($key, $expire + 600); 
 
-        } else {
-            //失败，清除
-            unset($this->locks[$key]);
         }
-
         return $isLock;
     }
 
