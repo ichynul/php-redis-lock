@@ -97,7 +97,7 @@ class RedisLockLogic
      *
      * @param string $key
      * @param string $owner 用于区别不同操作人，如：用户id，用户ip
-     * @param int $expire 业务超时(秒)，根据业务复杂程度调节。尽量大些，避免请求量大时服务器卡顿导致锁自动超时。锁的释放应该在业务/请求结束时手动释放，而不是依赖超时。
+     * @param int $expire 业务超时(秒)，根据业务复杂程度调节。尽量大些，避免请求量大时服务器卡顿导致锁自动释放。锁的释放应该在业务/请求结束时手动释放，而不是依赖超时自动。
      * @return bool 是否加锁成功
      */
     public function lock($key, $owner = '', $expire = 120)
