@@ -45,6 +45,8 @@ class RedisLockLogic
 
     protected $separator = '__redis_lock__';
     protected $predis = false;
+    
+    protected static $instance = [];
 
     public function __construct($options = [])
     {
@@ -90,6 +92,8 @@ class RedisLockLogic
         } else {
             throw new \Exception('未安装Redis扩展或Predis');
         }
+        
+        static::$instance[] = $this;
     }
 
     /**
@@ -221,6 +225,19 @@ class RedisLockLogic
 
         }
         return $isLock;
+    }
+    
+    /**
+     * 检测并释放未正常释放的key。一般用在中间件中请求结束时调用
+     */
+    public static function checkUnexpectedKeys()
+    {
+        if (!empty(static::$instance)) {
+            foreach (static::$instance as $key => $ins) {
+                $ins->unlockAll();
+            }
+        }
+        static::$instance = [];
     }
 
     /**
