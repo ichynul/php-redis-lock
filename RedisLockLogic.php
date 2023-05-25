@@ -114,8 +114,8 @@ class RedisLockLogic
             throw new \Exception('已存在key不为空,请确保每个key只加锁一次:' . $key); //
         }
 
-        if ($expire < 1) {
-            $expire = 1;
+        if ($expire < 5) {
+            $expire = 5;
         }
 
         //操作人为空，使用随机数
@@ -158,7 +158,7 @@ class RedisLockLogic
     public function unlockAll()
     {
         foreach ($this->locks as $key => $val) {
-            $this->del($key, $this->locks[$key]);
+            $this->del($key, $val);
             unset($this->locks[$key]);
         }
     }
