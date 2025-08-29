@@ -35,17 +35,17 @@ class RedisLockLogic
         'host' => '127.0.0.1',
         'port' => 6379,
         'password' => '',
-        'select' => 4,
+        'select' => null, //0~15 或null自动选择
         'timeout' => 0,
         'persistent' => false,
-        'prefix' => 'lock_', //不同的站点可以设置不同的前缀
+        'prefix' => '', //填写或留空自动选择
     ];
 
     protected $locks = [];
 
     protected $separator = '__redis_lock__';
     protected $predis = false;
-    
+
     protected static $instance = [];
 
     public function __construct($options = [])
@@ -53,6 +53,12 @@ class RedisLockLogic
         if ($options) {
             $this->options = array_merge($this->options, $options);
         }
+        $str = preg_replace('/\W/', '_', __FILE__) . ':';
+        if (is_null($this->options['select'])) {
+            $char = substr(md5($this->options['prefix']), 0, 1);
+            $this->options['select'] = is_numeric($char) ? $char : (['a' => 11, 'b' => 12, 'c' => 13, 'd' => 14, 'e' => 15, 'f' => 16][$char]);
+        }
+        $this->options['prefix'] = $this->options['prefix'] ?: $str;
 
         if (extension_loaded('redis')) {
             $this->handler = new \Redis;
@@ -92,7 +98,7 @@ class RedisLockLogic
         } else {
             throw new \Exception('未安装Redis扩展或Predis');
         }
-        
+
         static::$instance[] = $this;
     }
 
@@ -221,12 +227,11 @@ class RedisLockLogic
 
             //防止key写入成功后未正常释放，后续再未被访问，key就会一直存在。
             //让redis主动清理掉
-            $this->handler->expire($key, $expire + 600); 
-
+            $this->handler->expire($key, $expire + 600);
         }
         return $isLock;
     }
-    
+
     /**
      * 检测并释放未正常释放的key。一般用在中间件中请求结束时调用
      */
