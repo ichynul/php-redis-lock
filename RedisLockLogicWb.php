@@ -305,18 +305,19 @@ LUA;
         } elseif (class_exists('\Predis\Client')) {
             //predis composer安装
             $params = [];
-            foreach ($this->options as $key => $val) {
+            $options = $this->options;
+            foreach ($options as $key => $val) {
                 if (in_array($key, ['aggregate', 'cluster', 'connections', 'exceptions', 'prefix', 'profile', 'replication', 'parameters'])) {
                     $params[$key] = $val;
-                    unset($this->options[$key]);
+                    unset($options[$key]);
                 }
             }
 
-            if ('' == $this->options['password']) {
-                unset($this->options['password']);
+            if ('' == $options['password']) {
+                unset($options['password']);
             }
 
-            $handler = new \Predis\Client($this->options, $params);
+            $handler = new \Predis\Client($options, $params);
 
             $this->options['prefix'] = '';
         } else {
