@@ -246,7 +246,8 @@ LUA;
                 static::$pool->setConnectionCreator(function () {
                     return $this->make();
                 });
-                static::$pool->setConnectionCloser(function ($connection) {
+                static::$pool->setConnectionCloser(function ($connection) use ($key) {
+                    Context::set($key, null);
                     if (method_exists($connection, 'close')) {
                         $connection->close();
                     } else {
